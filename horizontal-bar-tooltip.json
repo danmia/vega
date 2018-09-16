@@ -1,0 +1,100 @@
+/*
+	This tool tip example has the tool tips centered inside the bars.
+*/
+{
+  "$schema": "https://vega.github.io/schema/vega/v4.json",
+  "width": 1024,
+  "height": 768,
+  "padding": 5,
+
+  "data": [
+    {
+      "name": "table",
+      "values": [
+        {"category": "A", "amount": 28},
+        {"category": "B", "amount": 55},
+        {"category": "C", "amount": 43},
+        {"category": "D", "amount": 91},
+        {"category": "E", "amount": 81},
+        {"category": "F", "amount": 53},
+        {"category": "G", "amount": 19},
+        {"category": "H", "amount": 87}
+      ]
+    }
+  ],
+
+  "signals": [
+    {
+      "name": "tooltip",
+      "value": {},
+      "on": [
+        {"events": "rect:mouseover", "update": "datum"},
+        {"events": "rect:mouseout",  "update": "{}"}
+      ]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "yscale",
+      "type": "band",
+      "domain": {"data": "table", "field": "category"},
+      "range": "height",
+      "padding": 0.05,
+      "round": true
+    },
+    {
+      "name": "xscale",
+      "domain": {"data": "table", "field": "amount"},
+      "nice": true,
+      "range": "width"
+    }
+  ],
+
+  "axes": [
+    { "orient": "bottom", "scale": "xscale" },
+    { "orient": "left", "scale": "yscale" }
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data":"table"},
+      "encode": {
+        "enter": {
+          "y": {"scale": "yscale", "field": "category"},
+          "height": {"scale": "yscale", "band": 1},
+          "x": {"scale": "xscale", "field": "amount"},
+          "x2": {"scale": "xscale", "value": 0}
+        },
+        "update": {
+          "fill": {"value": "steelblue"}
+        },
+        "hover": {
+          "fill": {"value": "red"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "encode": {
+        "enter": {
+          "align": {"value": "center"},
+          "baseline": {"value": "bottom"},
+          "fill": {"value": "#fff"}
+        },
+        "update": {
+          "x": {"scale": "xscale", "signal": "tooltip.amount", "band": 0.5},
+          "y": {"scale": "yscale", "signal": "tooltip.category", "offset": -2},
+          "dy": {"scale": "yscale", "band": true, "mult": 0.5}, 
+          "dx": {"scale": "xscale", "offset": -20},
+          "text": {"signal": "tooltip.amount"},
+          "fillOpacity": [
+            {"test": "datum === tooltip", "value": 0},
+            {"value": 1}
+          ]
+        }
+      }
+    }
+  ]
+}
